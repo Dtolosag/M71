@@ -1,0 +1,92 @@
+{
+  "name": "Login M71",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "login-m71",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "webhook-node",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const user = $json.body.user || '';\nconst pass = $json.body.pass || '';\n\n// Cambiar estas credenciales según sea necesario\nconst VALID_USER = 'admin';\nconst VALID_PASS = 'm71trading2026';\n\nif (user === VALID_USER && pass === VALID_PASS) {\n  return [{ json: { result: 'ok' } }];\n} else {\n  return [{ json: { result: 'fail' } }];\n}"
+      },
+      "id": "verificar-node",
+      "name": "Verificar Credenciales",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.result }}",
+              "rightValue": "ok",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "if-node",
+      "name": "Es válido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ token: '204bde75d9e25b03052678a953114ff2ab3c1da3b8bc9c57ab246fa58e672c73' }) }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "ok-node",
+      "name": "Responder OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [920, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ error: 'Credenciales incorrectas' }) }}",
+        "options": { "responseCode": 401 }
+      },
+      "id": "fail-node",
+      "name": "Responder Fail",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [920, 420]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{"node": "Verificar Credenciales", "type": "main", "index": 0}]]
+    },
+    "Verificar Credenciales": {
+      "main": [[{"node": "Es válido?", "type": "main", "index": 0}]]
+    },
+    "Es válido?": {
+      "main": [
+        [{"node": "Responder OK", "type": "main", "index": 0}],
+        [{"node": "Responder Fail", "type": "main", "index": 0}]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

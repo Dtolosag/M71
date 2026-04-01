@@ -124,6 +124,9 @@
   </div>
 
   <script>
+    const M71_TOKEN = sessionStorage.getItem('m71_token');
+    if (!M71_TOKEN) window.location.href = '/login.html';
+
     const WEBHOOK_URL = 'https://n8n.somospuraia.com/webhook/generar-reporte-m71';
 
     async function generarPDF() {
@@ -146,7 +149,7 @@
       try {
         const res = await fetch(WEBHOOK_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-M71-Token': M71_TOKEN },
           body: JSON.stringify({ sheet_id: sheetId, email })
         });
 
