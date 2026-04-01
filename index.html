@@ -111,9 +111,6 @@
     <label for="sheetId">ID del Google Sheet</label>
     <input id="sheetId" type="text" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms" />
 
-    <label for="email">Email para enviar (opcional)</label>
-    <input id="email" type="email" placeholder="alejandro@m71trading.com" />
-
     <button id="btn" onclick="generarPDF()">Generar PDF</button>
     <div class="status" id="status"></div>
 
@@ -131,7 +128,7 @@
 
     async function generarPDF() {
       const sheetId = document.getElementById('sheetId').value.trim();
-      const email = document.getElementById('email').value.trim();
+
       const btn = document.getElementById('btn');
       const status = document.getElementById('status');
 
@@ -150,7 +147,7 @@
         const res = await fetch(WEBHOOK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-M71-Token': M71_TOKEN },
-          body: JSON.stringify({ sheet_id: sheetId, email })
+          body: JSON.stringify({ sheet_id: sheetId })
         });
 
         if (!res.ok) {
