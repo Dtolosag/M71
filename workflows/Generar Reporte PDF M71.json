@@ -211,54 +211,6 @@
       ],
       "id": "f8dcfc5c-e1f2-4990-bbdf-c722d6ef47d5",
       "name": "Code in JavaScript"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": false
-          },
-          "conditions": [
-            {
-              "leftValue": "={{ $('Preparar Datos').first().json.email }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "notEquals"
-              }
-            }
-          ]
-        }
-      },
-      "id": "if-email-node",
-      "name": "Tiene Email?",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        2640,
-        -48
-      ]
-    },
-    {
-      "parameters": {
-        "fromEmail": "={{ $env.N8N_SMTP_SENDER }}",
-        "toEmail": "={{ $('Preparar Datos').first().json.email }}",
-        "subject": "=Reporte M71 - {{ $('Construir HTML').first().json.mes }} {{ $('Construir HTML').first().json.anio }}",
-        "emailType": "text",
-        "message": "=Adjunto encontras el reporte de resultados de {{ $('Construir HTML').first().json.mes }} {{ $('Construir HTML').first().json.anio }}.\n\nTotal: {{ $('Construir HTML').first().json.total }}\n\nSaludos,\nM71 Trading",
-        "options": {
-          "attachments": "data",
-          "appendAttribution": false
-        }
-      },
-      "id": "send-email-node",
-      "name": "Enviar Email",
-      "type": "n8n-nodes-base.emailSend",
-      "typeVersion": 2.1,
-      "position": [
-        2880,
-        -48
-      ]
     }
   ],
   "pinData": {},
@@ -338,29 +290,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Responder con PDF": {
-      "main": [
-        [
-          {
-            "node": "Tiene Email?",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Tiene Email?": {
-      "main": [
-        [
-          {
-            "node": "Enviar Email",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        []
       ]
     }
   },
