@@ -191,7 +191,7 @@
         }
       },
       "id": "ad835a4d-84d3-4547-9d45-ee1087f39ef0",
-      "name": "Responder con Imagen",
+      "name": "Responder con PDF",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [
@@ -201,7 +201,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const pdf = $input.first().binary.imgData;\n\nreturn [\n  {\n    json: {},\n    binary: {\n      data: pdf\n    }\n  }\n];"
+        "jsCode": "const pdf = $input.first().binary.pdfData;\n\nreturn [\n  {\n    json: {},\n    binary: {\n      data: pdf\n    }\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -211,54 +211,6 @@
       ],
       "id": "f8dcfc5c-e1f2-4990-bbdf-c722d6ef47d5",
       "name": "Code in JavaScript"
-    },
-    {
-      "parameters": {
-        "url": "http://gotenberg:3000/forms/chromium/screenshot/html",
-        "sendBody": true,
-        "contentType": "multipart-form-data",
-        "bodyParameters": {
-          "parameters": [
-            {
-              "parameterType": "formBinaryData",
-              "name": "files",
-              "inputDataFieldName": "htmlFile"
-            },
-            {
-              "name": "width",
-              "value": "900"
-            },
-            {
-              "name": "height",
-              "value": "={{ $json.pageHeightPx }}"
-            },
-            {
-              "name": "clip",
-              "value": "true"
-            },
-            {
-              "name": "format",
-              "value": "png"
-            }
-          ]
-        },
-        "options": {
-          "response": {
-            "response": {
-              "responseFormat": "file",
-              "outputPropertyName": "imgData"
-            }
-          }
-        }
-      },
-      "id": "convertir-imagen-node",
-      "name": "Convertir a Imagen",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        2032,
-        -128
-      ]
     }
   ],
   "pinData": {},
@@ -314,18 +266,19 @@
             "node": "Convertir a PDF",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "Convertir a Imagen",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
     },
     "Convertir a PDF": {
       "main": [
-        []
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Code in JavaScript": {
@@ -333,17 +286,6 @@
         [
           {
             "node": "Responder con PDF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Convertir a Imagen": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
