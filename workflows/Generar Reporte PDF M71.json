@@ -148,10 +148,6 @@
             {
               "name": "paperHeight",
               "value": "={{ $json.paperHeight }}"
-            },
-            {
-              "name": "scale",
-              "value": "2"
             }
           ]
         },
