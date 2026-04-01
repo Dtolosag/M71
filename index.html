@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M71 Trading — Generador de Reportes</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d0d0d;
+      color: #fff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #151515;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 40px 48px;
+      width: 100%;
+      max-width: 460px;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .logo img {
+      height: 48px;
+    }
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: #666;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      background: #1e1e1e;
+      border: 1px solid #2e2e2e;
+      border-radius: 7px;
+      color: #fff;
+      font-size: 14px;
+      padding: 10px 14px;
+      margin-bottom: 18px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: #3dff50; }
+    input::placeholder { color: #444; }
+    button {
+      width: 100%;
+      background: #3dff50;
+      color: #000;
+      border: none;
+      border-radius: 7px;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 13px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 4px;
+    }
+    button:hover { opacity: 0.88; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .status {
+      margin-top: 16px;
+      font-size: 13px;
+      text-align: center;
+      min-height: 20px;
+      color: #666;
+    }
+    .status.error { color: #ff4040; }
+    .status.success { color: #3dff50; }
+    .help {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid #1e1e1e;
+      font-size: 12px;
+      color: #444;
+    }
+    .help a { color: #3dff50; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <img src="assets/logo-m71.png" alt="M71 Trading" onerror="this.style.display='none'">
+    </div>
+    <h1>Generador de Reporte Mensual</h1>
+    <p class="subtitle">Ingresá el ID del Google Sheet con los datos del mes</p>
+
+    <label for="sheetId">ID del Google Sheet</label>
+    <input id="sheetId" type="text" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms" />
+
+    <label for="email">Email para enviar (opcional)</label>
+    <input id="email" type="email" placeholder="alejandro@m71trading.com" />
+
+    <button id="btn" onclick="generarPDF()">Generar PDF</button>
+    <div class="status" id="status"></div>
+
+    <div class="help">
+      ¿Cómo obtener el ID del Sheet? Abrí el Google Sheet → copiá el ID de la URL:<br>
+      <code style="color:#3dff50">docs.google.com/spreadsheets/d/<b>[ID_AQUÍ]</b>/edit</code>
+    </div>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = 'https://n8n.somospuraia.com/webhook/generar-reporte-m71';
+
+    async function generarPDF() {
+      const sheetId = document.getElementById('sheetId').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const btn = document.getElementById('btn');
+      const status = document.getElementById('status');
+
+      if (!sheetId) {
+        status.className = 'status error';
+        status.textContent = 'Ingresá el ID del Google Sheet.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Generando PDF...';
+      status.className = 'status';
+      status.textContent = 'Procesando datos del Sheet...';
+
+      try {
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sheet_id: sheetId, email })
+        });
+
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(err || `Error ${res.status}`);
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'reporte-m71.pdf';
+        a.click();
+        URL.revokeObjectURL(url);
+
+        status.className = 'status success';
+        status.textContent = 'PDF generado y descargado.';
+      } catch (err) {
+        status.className = 'status error';
+        status.textContent = 'Error: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Generar PDF';
+      }
+    }
+  </script>
+</body>
+</html>
